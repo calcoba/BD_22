@@ -11,9 +11,11 @@ def load_data(file_path):
                                  'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
     print('Loaded')
     plane_data.show(5)
+    print("number of cells:", plane_data.count())
+    plane_data.filter(plane_data.CancellationCode.isNull()).show(10)
     return plane_data, target_data
 
 
-file_paths = ['C:/Users/carlo/PycharmProjects/pythonProject/data/2006.csv']
+file_paths = ['C:/Users/javij/Documents/GitHub/BD_22/data/2006.csv']
 
 plane_db, target_db = load_data(file_paths)
