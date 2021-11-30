@@ -23,7 +23,7 @@ def plot_corr_matrix(correlations, attr, fig_no):
 def compute_corr(data_base):
     # convert to vector column first
     vector_col = "corr_features"
-    plane_corr_db = data_base.drop('UniqueCarrier', 'TailNum', 'Origin', 'Dest')
+    plane_corr_db = data_base.drop('UniqueCarrier', 'TailNum', 'Origin', 'Dest', 'Cancelled')
     assembler = VectorAssembler(inputCols=plane_corr_db.columns, outputCol=vector_col)
     df_vector = assembler.transform(plane_corr_db).select(vector_col)
 
