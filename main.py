@@ -13,7 +13,7 @@ if __name__ == '__main__':
     for file_name in files:
         plane_db, target_db = load_data.load_data(spark, path+file_name+'.csv')
 
-    #data_exploration.compute_corr(plane_db)
+    data_exploration.compute_corr(plane_db)
     chiSquared_results = data_exploration.compute_ChiSquared(spark, plane_db)
     print(str(chiSquared_results.statistics))
 
