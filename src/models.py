@@ -5,20 +5,34 @@ import numpy as np
 from pyspark.ml.tuning import CrossValidator
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.feature import VectorAssembler
-
 from pyspark.ml.regression import LinearRegression
-def LinearRegression(df):
 
-    assembler = VectorAssembler(inputCols=df.columns, outputCol="features") #imprescindible, crea una nueva columna 'features' que es un
-                                                                            # vector de las demas caracteristicas                                                                            
-    lr=LinearRegression(featuresCol='features', labelCol='ArrDelay', predictionCol='y_pred', 
-                        maxIter=100, regParam=0.0, elasticNetParam=0.0, tol=1e-06, fitIntercept=True, standardization=True, 
-                        solver='auto', weightCol=None, aggregationDepth=2, loss='squaredError', epsilon=1.35, maxBlockSizeInMB=0.0)
 
-    model = lr.fit(df)
-    coeficients = model.coeficients
+def linea_regression_model(df, vectorization=True, features_col=None):
+    if vectorization:
+        features_col = "features"
+        assembler = VectorAssembler(inputCols=df.drop('ArrDelay').columns, outputCol=features_col) #imprescindible, crea una nueva columna 'features' que es un
+                                                                            # vector de las demas caracteristicas
+        df = assembler.transform(df).select('ArrDelay', 'features')
+    df.show(5, False)
+    lr = LinearRegression(featuresCol=features_col, labelCol='ArrDelay', maxIter=100,  fitIntercept=True,
+                          standardization=True)
+    splits = df.randomSplit([0.7, 0.3])
+    train_df = splits[0]
+    test_df = splits[1]
+    train_df.show(5, False)
+    model = lr.fit(train_df)
+    # predictions = model.trans
+    coefficients = model.coefficients
+    lr_predictions = model.transform(test_df)
+    lr_predictions.select("prediction", "ArrDelay", features_col).show(5, False)
+    from pyspark.ml.evaluation import RegressionEvaluator
+    lr_evaluator = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="r2")
+    print("R Squared (R2) on test data = %g" % lr_evaluator.evaluate(lr_predictions))
+    lr_evaluator = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="rmse")
+    print("R Squared (R2) on test data = %g" % lr_evaluator.evaluate(lr_predictions))
 
-    return coeficients
+    return coefficients
 
 
 
