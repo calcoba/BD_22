@@ -12,7 +12,7 @@ if __name__ == '__main__':
     path = 'data/'
     files = ['2006']
     for file_name in files:
-        plane_db, target_db = load_data.load_data(spark, path+file_name+'.csv')
+        plane_db, target_db = load_data.load_data(spark, path+'*.csv')
 
     '''data_exploration.compute_corr(plane_db, plane_db.columns)
     plane_db.printSchema()'''
