@@ -8,14 +8,15 @@ def load_data(spark, file_path):
     plane_data.show(12)
     target_data = plane_data['ArrDelay']
     
-    #Eliminate forbidden variables
+    # Eliminate forbidden variables
     plane_data = plane_data.drop('ArrTime', 'ActualElapsedTime', 'AirTime', 'TaxiIn', 'Diverted',
                                  'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
     print('Loaded')
+    plane_data.count()
     print("Number of instances:", plane_data.count())
     
     # plane_data.filter(plane_data.CancellationCode.isNull()).show(10)
-    ## Eliminate Cancelled flights and, then, the cancelalation columns
+    # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
     plane_data=plane_data.drop('Cancelled', 'CancellationCode')
 
@@ -23,6 +24,7 @@ def load_data(spark, file_path):
                fit(plane_data) for column_name in ['UniqueCarrier', 'TailNum', 'Origin', 'Dest']]
 
     pipeline = Pipeline(stages=indexer)
+    plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     # plane_data.select([F.count(F.when(F.isnan(c) | F.col(c).isNull(), c)).alias(c) for c in plane_data.columns]).show()
 
@@ -32,6 +34,7 @@ def load_data(spark, file_path):
     plane_data_clean = plane_data.select(*cols_filtered)
     plane_data_clean.show(5)
     # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
+    plane_data_clean.count()
     print("Number of instances after preprocessing:", plane_data_clean.count())
 
 

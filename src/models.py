@@ -13,7 +13,6 @@ def RandomForest(df):
     rf = RandomForestRegressor(labelCol="ArrDelay", featuresCol="features")
     pipeline = Pipeline(stages=[assembler, rf])
     param_grid = ParamGridBuilder() \
-        .addGrid(rf.numTrees, [int(x) for x in np.linspace(start=70, stop=100, num=10)]) \
         .addGrid(rf.maxDepth, [int(x) for x in np.linspace(start=5, stop=11, num=2)]) \
         .build()
 
@@ -26,7 +25,8 @@ def RandomForest(df):
     predictions = cv_model.transform(testData)
     regression_evaluator = RegressionEvaluator(labelCol='ArrDelay', metricName='rmse')
     print('Random Forest classifier Accuracy:', regression_evaluator.evaluate(predictions))
-    y_true = predictions.select(['ArrDelay']).collect()
-    y_pred = predictions.select(['prediction']).collect()
+    y_true = predictions.select(['ArrDelay'])
+    y_pred = predictions.select(['prediction'])
+    print('Done')
 
     return y_true, y_pred
