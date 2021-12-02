@@ -21,26 +21,31 @@ def plot_corr_matrix(correlations, attr, fig_no):
     plt.show()
 
 
-def compute_corr(data_base):
+def compute_corr(data_base, attr, vectorize=True):
     # convert to vector column first
+
     vector_col = "corr_features"
     assembler = VectorAssembler(inputCols=data_base.columns, outputCol=vector_col)
     df_vector = assembler.transform(data_base).select(vector_col)
-
+    df_vector.show(5, False)
+    print(vector_col)
     # get correlation matrix
     pearson_corr = Correlation.corr(df_vector, vector_col, 'pearson').collect()[0][0]
-    print(pearson_corr)
+    # print(pearson_corr)
     corr_matrix = pearson_corr.toArray().tolist()
 
-    plot_corr_matrix(corr_matrix, data_base.columns, 234)
+    plot_corr_matrix(corr_matrix, attr, 234)
 
 
-def compute_ChiSquared(spark, data_base):
-    features_names = data_base.drop('ArrDelay').schema.names
-    vector_col = "features"
-    assembler = VectorAssembler(inputCols=data_base.drop('ArrDelay').columns, outputCol=vector_col)
-    vectorized_df = assembler.transform(data_base).select("ArrDelay", "features")
+def compute_ChiSquared(spark, data_base, vectorize=True):
+    if vectorize:
+        vector_col = "features"
+        assembler = VectorAssembler(inputCols=data_base.drop('ArrDelay').columns, outputCol=vector_col)
+        vectorized_df = assembler.transform(data_base).select("ArrDelay", "features")
+    else:
+        vectorized_df = data_base
+        vector_col = "pca_features"
     vectorized_df.show(5)
-    chiSquares_values = ChiSquareTest.test(vectorized_df, "features", "ArrDelay")
+    chiSquares_values = ChiSquareTest.test(vectorized_df, vector_col, "ArrDelay")
     chiSquares_values.show()
     return chiSquares_values
