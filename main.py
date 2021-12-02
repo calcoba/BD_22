@@ -1,11 +1,10 @@
 import src.load_data as load_data
-from src import data_exploration, PCA
+from src import data_exploration, PCA, models
 from pyspark.sql import SparkSession
 
 if __name__ == '__main__':
     # spark = SparkSession.builder.appName('big_data_project').getOrCreate()
     spark = SparkSession.builder \
-        .config("spark.driver.memory", "14g") \
         .appName('big_data_project') \
         .getOrCreate()
     path = 'data/'
@@ -22,5 +21,6 @@ if __name__ == '__main__':
     data_exploration.compute_corr(pca_data.select('pca_features', 'ArrDelay'),
                                   ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'ArrDelay'], False)
 
+    y_true, y_pred = models.RandomForest(plane_db)
 
 
