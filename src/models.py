@@ -6,6 +6,22 @@ from pyspark.ml.tuning import CrossValidator
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.feature import VectorAssembler
 
+from pyspark.ml.regression import LinearRegression
+def LinearRegression(df):
+
+    assembler = VectorAssembler(inputCols=df.columns, outputCol="features") #imprescindible, crea una nueva columna 'features' que es un
+                                                                            # vector de las demas caracteristicas                                                                            
+    lr=LinearRegression(featuresCol='features', labelCol='ArrDelay', predictionCol='y_pred', 
+                        maxIter=100, regParam=0.0, elasticNetParam=0.0, tol=1e-06, fitIntercept=True, standardization=True, 
+                        solver='auto', weightCol=None, aggregationDepth=2, loss='squaredError', epsilon=1.35, maxBlockSizeInMB=0.0)
+
+    model = lr.fit(df)
+    coeficients = model.coeficients
+
+    return coeficients
+
+
+
 
 def RandomForest(df):
     assembler = VectorAssembler(inputCols=df.drop('ArrDelay').columns, outputCol="features")
