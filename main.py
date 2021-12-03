@@ -14,12 +14,19 @@ if __name__ == '__main__':
         .getOrCreate()
 
     path = './data/'
-    '''compressed_file_path = glob.glob(path+'*.csv.bz2')
-    decompress.decompress(compressed_file_path)'''
 
-    #files = glob.glob(path+'*.csv')
-    #for file_name in files:
-    plane_db = load_data.load_data(spark, path+'*.csv')
+    compressed_folder_path = glob.glob(path+'*.zip')
+    
+    if compressed_folder_path == []: # This means that there aren't zip folders in the data directory
+       compressed_file_path = glob.glob(path+'*.csv.bz2')
+       print('No zip folders are located in the "data" folder.')
+       decompress.decompress_bz2(compressed_file_path)   # Decompress bz2 files     
+    else:        
+       decompress.decompress_zip(compressed_folder_path) # Extract bz2 files from the zip folder
+       compressed_file_path = glob.glob(path+'*.csv.bz2') 
+       decompress.decompress_bz2(compressed_file_path)   # Decompress bz2 files
+
+    plane_db, target_db = load_data.load_data(spark, path+'*.csv')
 
     data_exploration.compute_corr(plane_db.drop('features', 'features_scaled'),
                                   plane_db.drop('features', 'features_scaled').columns)
