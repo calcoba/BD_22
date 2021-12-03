@@ -20,7 +20,7 @@ def load_data(spark, file_path):
 
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
-    plane_data=plane_data.drop('Cancelled', 'CancellationCode')
+    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum')
 
     # Numercally encode remaining categorical variables
     indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index').
