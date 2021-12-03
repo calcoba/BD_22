@@ -1,5 +1,5 @@
 import pyspark.sql.functions as F
-from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, OneHotEncoder
+from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, QuantileDiscretizer, Bucketizer
 from pyspark.ml import Pipeline
 
 
@@ -15,19 +15,26 @@ def load_data(spark, file_path):
     print("Number of instances:", plane_data.count())
 
     # Eliminate variables that are not related with the delay
-    plane_data = plane_data.drop('TaxiOut', 'TailNum', 'FlightNum', 'DepTime')
+    plane_data = plane_data.drop('TailNum', 'FlightNum')
 
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
-    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum')
+    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum', 'DayofMonth')
 
     # Numerically encode remaining categorical variables
-    indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index').
-               fit(plane_data) for column_name in ['UniqueCarrier', 'Origin', 'Dest', 'Route']]
+    indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index')
+               for column_name in ['UniqueCarrier', 'Origin', 'Dest', 'Route']]
+    bucketizer = [Bucketizer(inputCols=['CRSDepTime', 'Month', 'DayOfWeek'],
+                             outputCols=['DepTimePeriod', 'Season', 'WeekPeriod'],
+                             splitsArray=[[0, 600, 1200, 1800, 2400], [1, 3, 6, 9, 12], [1, 5, 7]])]
 
-    pipeline = Pipeline(stages=indexer)
+    pipeline = Pipeline(stages=indexer+bucketizer)
+    plane_data = plane_data.fillna(0, subset='TaxiOut')
+    plane_data = plane_data.withColumn('DepTimeDiff', plane_data.DepTime-plane_data.CRSDepTime)
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
+    plane_data = plane_data.drop('Month', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
+                                 'Dest_index', 'Route_index')
     plane_data.show(5, True)
     # Eliminate redundant categorical columns
     cols_filtered = [c for c, t in plane_data.dtypes if t != 'string']

@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import pyspark.sql
-from pyspark.ml.stat import Correlation, ChiSquareTest, KolmogorovSmirnovTest
+from pyspark.ml.stat import Correlation, ChiSquareTest
 from pyspark.ml.feature import VectorAssembler
 
 
 def plot_corr_matrix(correlations, attr, fig_no):
-    fig = plt.figure(fig_no, figsize=(30,30))
+    fig = plt.figure(fig_no, figsize=(30, 30))
     ax = fig.add_subplot(111)
     ax.set_title("Correlation Matrix for Specified Attributes")
     cax = ax.matshow(correlations, vmax=1, vmin=-1)
@@ -19,7 +18,7 @@ def plot_corr_matrix(correlations, attr, fig_no):
     plt.show()
 
 
-def compute_corr(data_base, attr, vectorize=True):
+def compute_corr(data_base, attr):
     # convert to vector column first
 
     vector_col = "corr_features"
@@ -35,7 +34,7 @@ def compute_corr(data_base, attr, vectorize=True):
     plot_corr_matrix(corr_matrix, attr, 234)
 
 
-def compute_ChiSquared(spark, data_base, vectorize=True):
+def compute_ChiSquared(data_base, vectorize=True):
     if vectorize:
         vector_col = "features"
         assembler = VectorAssembler(inputCols=data_base.drop('ArrDelay').columns, outputCol=vector_col)
@@ -44,6 +43,6 @@ def compute_ChiSquared(spark, data_base, vectorize=True):
         vectorized_df = data_base
         vector_col = "pca_features"
     vectorized_df.show(5)
-    chiSquares_values = ChiSquareTest.test(vectorized_df, vector_col, "ArrDelay")
-    chiSquares_values.show()
-    return chiSquares_values
+    chi_squares_values = ChiSquareTest.test(vectorized_df, vector_col, "ArrDelay")
+    chi_squares_values.show()
+    return chi_squares_values

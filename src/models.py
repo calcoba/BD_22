@@ -35,7 +35,7 @@ def random_forest_model(df, features_col='features_scaled', label_col='ArrDelay'
 
 
 def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'):
-    dt = DecisionTreeRegressor(labelCol=label_col, featuresCol=features_col, maxBins=5027)
+    dt = DecisionTreeRegressor(labelCol=label_col, featuresCol=features_col)
     param_grid = ParamGridBuilder() \
         .addGrid(dt.maxDepth, [5, 10, 15]) \
         .addGrid(dt.maxBins, [10, 20, 40, 80])\
