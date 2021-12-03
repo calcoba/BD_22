@@ -1,2 +1,4 @@
 
 data/2006.csv
+*.csv
+*.bz2

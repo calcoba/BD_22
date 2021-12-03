@@ -11,7 +11,7 @@ def load_data(spark, file_path):
     # Eliminate forbidden variables
     plane_data = plane_data.drop('ArrTime', 'ActualElapsedTime', 'AirTime', 'TaxiIn', 'Diverted',
                                  'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
-    print('Loaded')
+    print('All csv files loaded:')
     plane_data.count()
     print("Number of instances:", plane_data.count())
     
