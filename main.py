@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     path = './data/'
 
+
     compressed_folder_path = glob.glob(path + '*.zip')
 
     if not compressed_folder_path:  # This means that there aren't zip folders in the data directory
@@ -24,6 +25,7 @@ if __name__ == '__main__':
         decompress.decompress_zip(compressed_folder_path)  # Extract bz2 files from the zip folder
         compressed_file_path = glob.glob(path + '*.csv.bz2')
         decompress.decompress_bz2(compressed_file_path)  # Decompress bz2 files
+
 
     plane_db = load_data.load_data(spark, path + '*.csv')
 
