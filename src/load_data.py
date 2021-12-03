@@ -18,10 +18,10 @@ def load_data(spark, file_path):
     # plane_data.filter(plane_data.CancellationCode.isNull()).show(10)
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
-    plane_data=plane_data.drop('Cancelled', 'CancellationCode')
+    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum')
 
     indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index').
-               fit(plane_data) for column_name in ['UniqueCarrier', 'TailNum', 'Origin', 'Dest']]
+               fit(plane_data) for column_name in ['UniqueCarrier', 'Origin', 'Dest']]
 
     pipeline = Pipeline(stages=indexer)
     plane_data = plane_data.na.drop()
@@ -36,6 +36,5 @@ def load_data(spark, file_path):
     # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
     plane_data_clean.count()
     print("Number of instances after preprocessing:", plane_data_clean.count())
-
 
     return plane_data_clean, target_data
