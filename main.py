@@ -17,9 +17,9 @@ if __name__ == '__main__':
     compressed_file_path = glob.glob(path+'*.csv.bz2')
     decompress.decompress(compressed_file_path)
 
-    files = glob.glob(path+'*.csv')
-    for file_name in files:
-        plane_db, target_db = load_data.load_data(spark, path+'*.csv')
+    #files = glob.glob(path+'*.csv')
+    #for file_name in files:
+    plane_db, target_db = load_data.load_data(spark, path+'*.csv')
 
     '''data_exploration.compute_corr(plane_db, plane_db.columns)
     plane_db.printSchema()'''
