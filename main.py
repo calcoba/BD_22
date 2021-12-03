@@ -19,8 +19,11 @@ if __name__ == '__main__':
     
     if compressed_folder_path == []: # This means that there aren't zip folders in the data directory
        compressed_file_path = glob.glob(path+'*.csv.bz2')
-       print('No zip folders are located in the "data" folder.')
-       decompress.decompress_bz2(compressed_file_path)   # Decompress bz2 files     
+       print('No zip folders are located in the "data" folder.') 
+       if compressed_file_path == []: # This means that there aren't bz2 files in the data directory
+          print('No bz2 files are located in the "data" folder.')
+       else:
+          decompress.decompress_bz2(compressed_file_path)   # Decompress bz2 files     
     else:        
        decompress.decompress_zip(compressed_folder_path) # Extract bz2 files from the zip folder
        compressed_file_path = glob.glob(path+'*.csv.bz2') 
