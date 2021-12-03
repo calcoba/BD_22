@@ -1,5 +1,5 @@
 import pyspark.sql.functions as F
-from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler
+from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, OneHotEncoder
 from pyspark.ml import Pipeline
 
 
@@ -28,8 +28,7 @@ def load_data(spark, file_path):
     pipeline = Pipeline(stages=indexer)
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
-    # plane_data.select([F.count(F.when(F.isnan(c) | F.col(c).isNull(), c)).alias(c) for c in plane_data.columns]).show()
-
+    plane_data.show(5, True)
     # Eliminate redundant categorical columns
     cols_filtered = [c for c, t in plane_data.dtypes if t != 'string']
     plane_data_clean = plane_data.select(*cols_filtered)
