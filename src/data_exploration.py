@@ -16,8 +16,6 @@ def plot_corr_matrix(correlations, attr, fig_no):
     fig.colorbar(cax)
     ax.set_xticks(np.arange(len(attr)), labels=attr, fontsize=30, rotation=90)
     ax.set_yticks(np.arange(len(attr)), labels=attr, fontsize=30)
-    '''ax.set_xticklabels(attr, fontsize=30, rotation=45)
-    ax.set_yticklabels(attr, fontsize=30)'''
     plt.show()
 
 
