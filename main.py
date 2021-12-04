@@ -4,6 +4,7 @@ import decompress
 from pyspark.sql import SparkSession
 from src import models, PCA
 import glob
+import sys
 
 if __name__ == '__main__':
     # spark = SparkSession.builder.appName('big_data_project').getOrCreate()
@@ -13,7 +14,9 @@ if __name__ == '__main__':
         .getOrCreate()
 
     ### Locating, decompressing and loading data ###
-    path = './data/'
+    if len(sys.argv) > 1:
+        path = sys.argv[1]+'/'
+        print(path)
     compressed_folder_path = glob.glob(path + '*.zip')
     if not compressed_folder_path:  # This means that there aren't zip folders in the data directory
         compressed_file_path = glob.glob(path + '*.csv.bz2')
