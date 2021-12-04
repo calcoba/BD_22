@@ -34,13 +34,14 @@ if __name__ == '__main__':
     plane_db = load_data.load_data(spark, path + '*.csv')
 
     correlation_matrix = data_exploration.compute_corr(plane_db.drop('features', 'features_scaled'),
-                                                       plane_db.drop('features', 'features_scaled').columns)
+                                                       plane_db.drop('features', 'features_scaled').columns,
+                                                       name='Features')
 
     eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'))
     
     correlation_matrix_pca = data_exploration.compute_corr(pca_data.select('pca_features', 'ArrDelay'),
                                                            ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'PCA_4',
-                                                            'PCA_5', 'PCA_6', 'PCA_7', 'PCA_8', 'PCA_9', 'ArrDelay'])
+                                                            'ArrDelay'], name='PCA_features')
 
     y_pred_gbt, gbt_data = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
     y_pred_lr, lr_data = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))

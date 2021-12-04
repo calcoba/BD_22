@@ -28,7 +28,7 @@ def evaluate_test_set(cross_val, df):
     predictions = cv_model.transform(test_df)
     regression_evaluator_r2 = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="r2")
     regression_evaluator_rmse = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="rmse")
-    results = ["  Model results:"
+    results = ["  Model results:",
                "    R Squared (R2) on test data = %g" % regression_evaluator_r2.evaluate(predictions),
                "    RMSE on test data = %g" % regression_evaluator_rmse.evaluate(predictions)]
 
@@ -54,7 +54,7 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
             y_pred: the prediction made for the test set.
     """
 
-    dt = DecisionTreeRegressor(labelCol=label_col, featuresCol=features_col)
+    dt = DecisionTreeRegressor(labelCol=label_col, featuresCol=features_col, seed=0)
     param_grid = ParamGridBuilder() \
         .addGrid(dt.maxDepth, [5, 10, 15]) \
         .addGrid(dt.maxBins, [20, 40, 80])\

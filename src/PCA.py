@@ -1,7 +1,7 @@
 from pyspark.ml.feature import PCA
 
 
-def pca(df, k_number=10):
+def pca(df, k_number=5):
     pca_model = PCA(k=k_number, inputCol="features_scaled", outputCol="pca_features")
     model = pca_model.fit(df)
     pca_data = model.transform(df).select('pca_features', 'ArrDelay')

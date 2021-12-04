@@ -20,7 +20,7 @@ def load_data(spark, file_path):
 
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
-    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum', 'Month')
+    plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum')
 
 
     # Numerically encode remaining categorical variables and creating new ones
@@ -39,8 +39,10 @@ def load_data(spark, file_path):
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     plane_data = plane_data.withColumn('Week', F.when(plane_data.Weekend == 0, 1).otherwise(0))
-    plane_data = plane_data.drop('Month','DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
-                                 'Dest_index', 'Route_index', 'CRSElapsedTime')
+    '''plane_data = plane_data.drop('Month','DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
+                                 'Dest_index', 'Route_index', 'CRSElapsedTime', 'Month')'''
+    features_to_drop = ['Month', 'DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
+                        'Dest_index', 'Route_index', 'CRSElapsedTime', 'Month']
 
 
     # Eliminate redundant categorical columns
@@ -52,7 +54,8 @@ def load_data(spark, file_path):
     print("Number of instances after preprocessing:", plane_data_clean.count())
 
     # Merge variables and scale them
-    assembler = VectorAssembler(inputCols=plane_data_clean.drop('ArrDelay').columns, outputCol="features")
+    features_to_keep = ['Year', 'DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
+    assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
     scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
     pipeline = Pipeline(stages=[assembler, scaler])
     data_scaled = pipeline.fit(plane_data_clean).transform(plane_data_clean)

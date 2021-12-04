@@ -22,7 +22,7 @@ def plot_corr_matrix(correlations, attr, name):
     plt.close()
 
 
-def compute_corr(data_base, attr, display=True, name=None):
+def compute_corr(data_base, attr, name=None):
     """This function will compute the correlation matrix between the different features present in the dataset. The
     function takes the complete set of features and perform a vectorization operation with the VectorAssembler function
     from pyspark module. After that it call the function for plotting the matrix if it is set.
@@ -47,7 +47,6 @@ def compute_corr(data_base, attr, display=True, name=None):
     if not name:
         name = np.random.randint(0, 10)
 
-    if display:
-        plot_corr_matrix(corr_matrix, attr, name)
+    plot_corr_matrix(corr_matrix, attr, name)
 
     return corr_matrix
