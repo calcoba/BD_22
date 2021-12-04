@@ -57,7 +57,6 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
     dt = DecisionTreeRegressor(labelCol=label_col, featuresCol=features_col, seed=0)
     param_grid = ParamGridBuilder() \
         .addGrid(dt.maxDepth, [5, 10, 15]) \
-        .addGrid(dt.maxBins, [20, 40, 80])\
         .build()
     cross_val = CrossValidator(estimator=dt,
                                estimatorParamMaps=param_grid,
@@ -121,6 +120,7 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
     model_data.append(header_data)
     model_data.extend(parameter_data)
     model_data.extend(results)
+    model.write().overwrite().save('models/')
 
     return y_pred, model_data
 
@@ -144,7 +144,6 @@ def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'
     gbt = GBTRegressor(featuresCol=features_col, labelCol=label_col, seed=0)
     param_grid = ParamGridBuilder() \
         .addGrid(gbt.maxDepth, [5, 10, 15]) \
-        .addGrid(gbt.subsamplingRate, [0.7, 0.8, 1]) \
         .build()
     cross_val = CrossValidator(estimator=gbt,
                                estimatorParamMaps=param_grid,
