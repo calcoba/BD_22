@@ -16,7 +16,8 @@ if __name__ == '__main__':
     ### Locating, decompressing and loading data ###
     if len(sys.argv) > 1:
         path = sys.argv[1]+'/'
-        print(path)
+    else:
+        path = 'data/'
     compressed_folder_path = glob.glob(path + '*.zip')
     if not compressed_folder_path:  # This means that there aren't zip folders in the data directory
         compressed_file_path = glob.glob(path + '*.csv.bz2')

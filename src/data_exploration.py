@@ -1,35 +1,30 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from pyspark.ml.stat import Correlation, ChiSquareTest
+from pyspark.ml.stat import Correlation
 from pyspark.ml.feature import VectorAssembler
+import time
+import seaborn as sns
 
 
-def plot_corr_matrix(correlations, attr):
+def plot_corr_matrix(correlations, attr, name):
     """This function will display a plot of the correlation between the different variables presented in the
     dataframe.
         :parameter
             correlations: correlation matrix with the values for the correlation between each pairs of variables.
             attr: list of the different features names used for computing the correlation matrix.
     """
-
-    fig = plt.figure(1, figsize=(30, 30))
-    ax = fig.add_subplot(111)
-    ax.set_title("Correlation Matrix for Specified Attributes")
-    cax = ax.matshow(correlations, vmax=1, vmin=-1)
-
-    for (i, j), z in np.ndenumerate(correlations):
-        ax.text(j, i, '{:0.1f}'.format(z), ha='center', va='center', fontsize=30,
-                bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3'))
-
-    fig.colorbar(cax)
-    ax.set_xticks(np.arange(len(attr)), labels=attr, fontsize=30, rotation=90)
-    ax.set_yticks(np.arange(len(attr)), labels=attr, fontsize=30)
-    plt.show()
+    plt.figure(figsize=(20, 15))
+    plt.tight_layout()
+    plt.title("Correlation Matrix for Specified Attributes")
+    sns.heatmap(correlations, annot=True, cbar=True, xticklabels=attr, yticklabels=attr)
+    plt.yticks(rotation=0)
+    plt.savefig('data/'+str(name)+'.png',  dpi='figure', format='png')
+    plt.close()
 
 
-def compute_corr(data_base, attr, display=True):
+def compute_corr(data_base, attr, display=True, name=None):
     """This function will compute the correlation matrix between the different features present in the dataset. The
-    function takes the complete set of features and perform a vectorization operation witht he VectorAssembler function
+    function takes the complete set of features and perform a vectorization operation with the VectorAssembler function
     from pyspark module. After that it call the function for plotting the matrix if it is set.
         :parameter
             data_base: the dataframe with the complete set of variables. One variable for each of the columns, with
@@ -49,8 +44,10 @@ def compute_corr(data_base, attr, display=True):
     pearson_corr = Correlation.corr(df_vector, vector_col, 'pearson').collect()[0][0]
     # print(pearson_corr)
     corr_matrix = pearson_corr.toArray().tolist()
+    if not name:
+        name = np.random.randint(0, 10)
 
     if display:
-        plot_corr_matrix(corr_matrix, attr)
+        plot_corr_matrix(corr_matrix, attr, name)
 
     return corr_matrix
