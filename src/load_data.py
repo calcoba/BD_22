@@ -5,23 +5,26 @@ from pyspark.ml import Pipeline
 
 def load_data(spark, file_path):
     plane_data = spark.read.csv(file_path, header=True, inferSchema=True, nanValue='NA')
-    plane_data = plane_data.withColumn('Route', F.concat(plane_data.Origin, plane_data.Dest))
+    
+    print("Imported data: \n")
     plane_data.show(5)
+    print('All csv files loaded. DataFrame created.')
+    print("Number of instances:", plane_data.count())
 
     # Eliminate forbidden variables
     plane_data = plane_data.drop('ArrTime', 'ActualElapsedTime', 'AirTime', 'TaxiIn', 'Diverted',
                                  'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
-    print('All csv files loaded. DataFrame created.')
-    print("Number of instances:", plane_data.count())
 
     # Eliminate variables that are not related with the delay
-    plane_data = plane_data.drop('TailNum', 'FlightNum')
+    plane_data = plane_data.drop('TailNum', 'DayofMonth', 'FlightNum')
 
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
     plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum', 'Month')
 
-    # Numerically encode remaining categorical variables
+
+    # Numerically encode remaining categorical variables and creating new ones
+    plane_data = plane_data.withColumn('Route', F.concat(plane_data.Origin, plane_data.Dest))
     indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index')
                for column_name in ['UniqueCarrier', 'Origin', 'Dest', 'Route']]
     bucketizer = [Bucketizer(inputCols=['CRSDepTime', 'DayofMonth', 'DayOfWeek'],
@@ -32,15 +35,23 @@ def load_data(spark, file_path):
     pipeline = Pipeline(stages=indexer+bucketizer+quantilizer)
     plane_data = plane_data.fillna(0, subset='TaxiOut')
     plane_data = plane_data.withColumn('TotalDepDelay', plane_data.DepDelay+plane_data.TaxiOut)
+
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     plane_data = plane_data.withColumn('Week', F.when(plane_data.Weekend == 0, 1).otherwise(0))
     plane_data = plane_data.drop('Month', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
                                  'Dest_index', 'Route_index', 'CRSElapsedTime')
-    plane_data.show(5, True)
+
+
     # Eliminate redundant categorical columns
     cols_filtered = [c for c, t in plane_data.dtypes if t != 'string']
     plane_data_clean = plane_data.select(*cols_filtered)
+
+    print("Preprocesed data: \n")
+    plane_data_clean.show(5, False)
+    print("Number of instances after preprocessing:", plane_data_clean.count())
+
+    # Merge variables and scale them
     assembler = VectorAssembler(inputCols=plane_data_clean.drop('ArrDelay').columns, outputCol="features")
     scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
     pipeline = Pipeline(stages=[assembler, scaler])

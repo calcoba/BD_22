@@ -12,10 +12,9 @@ if __name__ == '__main__':
         .config("spark.driver.memory", "14g") \
         .getOrCreate()
 
+    ### Locating, decompressing and loading data ###
     path = './data/'
-
     compressed_folder_path = glob.glob(path + '*.zip')
-
     if not compressed_folder_path:  # This means that there aren't zip folders in the data directory
         compressed_file_path = glob.glob(path + '*.csv.bz2')
         print('No zip folders are located in the "data" folder.')
