@@ -3,5 +3,12 @@ Logistic Regression results:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.900075
-    RMSE on test data = 11.5863
+    R Squared (R2) on test data = 0.921501
+    RMSE on test data = 11.1371
+Logistic Regression results:
+  Best model has parameters:
+    Reg parameter: 0.001
+    Elastic Net parameter: 0.0
+  Model results:
+    R Squared (R2) on test data = 0.920673
+    RMSE on test data = 11.1585

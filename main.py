@@ -1,8 +1,7 @@
 import src.load_data as load_data
-from src import data_exploration
+from src import data_exploration, models, PCA, prediction_from_model
 import decompress
 from pyspark.sql import SparkSession
-from src import models, PCA
 import glob
 import sys
 
@@ -33,27 +32,51 @@ if __name__ == '__main__':
 
     plane_db = load_data.load_data(spark, path + '*.csv')
 
-    '''correlation_matrix = data_exploration.compute_corr(plane_db.drop('features', 'features_scaled'),
-                                                       plane_db.drop('features', 'features_scaled').columns,
-                                                       name='Features')
-
     eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'))
-    
-    correlation_matrix_pca = data_exploration.compute_corr(pca_data.select('pca_features', 'ArrDelay'),
-                                                           ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'PCA_4',
-                                                            'ArrDelay'], name='PCA_features')
 
-    y_pred_gbt, gbt_data = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))'''
-    y_pred_lr, lr_data = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
-    '''y_pred_dt, dt_data = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
-    y_pred_lr_pca, lr_pca_data = models.linear_regression_model(pca_data, features_col="pca_features")
+    if len(sys.argv) == 1 or len(sys.argv) == 2:
+        print('Generating model from data')
+        correlation_matrix = data_exploration.compute_corr(plane_db.drop('features', 'features_scaled'),
+                                                           plane_db.drop('features', 'features_scaled').columns,
+                                                           name='Features')
 
-    complete_results = []
-    complete_results.extend(gbt_data)
-    complete_results.extend(lr_data)
-    complete_results.extend(dt_data)
-    complete_results.extend(lr_pca_data)
-    with open('results.txt', 'w') as file_name:
-        for line in complete_results:
-            file_name.write(line+'\n')
-        file_name.close()'''
+        correlation_matrix_pca = data_exploration.compute_corr(pca_data.select('pca_features', 'ArrDelay'),
+                                                               ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'PCA_4',
+                                                                'ArrDelay'], name='PCA_features')
+
+        y_pred_gbt, gbt_data = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
+        y_pred_lr, lr_data = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
+        y_pred_dt, dt_data = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
+        y_pred_lr_pca, lr_pca_data = models.linear_regression_model(pca_data, features_col="pca_features")
+
+        complete_results = []
+        complete_results.extend(gbt_data)
+        complete_results.extend(lr_data)
+        complete_results.extend(dt_data)
+        complete_results.extend(lr_pca_data)
+        with open('results.txt', 'w') as file_name:
+            for line in complete_results:
+                file_name.write(line+'\n')
+            file_name.close()
+
+    elif len(sys.argv) == 3:
+        print('Starting test')
+        model_name = sys.argv[2]
+        if model_name == 'lr':
+            model_path = 'lr_model'
+            features = 'features_scaled'
+        elif model_name == 'gbt':
+            model_path = 'gbt_model'
+            features = 'features_scaled'
+        elif model_name == 'dt':
+            model_path = 'dt_model'
+            features = 'features_scaled'
+        elif model_name == 'lr_pca':
+            model_path = 'lr_pca_model'
+            features = 'pca_features'
+            plane_db = pca_data
+        else:
+            print('Please select a valid model')
+            sys.exit()
+        predictions = prediction_from_model.generate_predictions(model_path, model_name,
+                                                                 plane_db.select(features, 'ArrDelay'))
