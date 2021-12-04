@@ -112,6 +112,8 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
 
     model_data = []
     header_data = 'Logistic Regression results:'
+    if features_col == 'pca_features':
+        header_data = 'Logistic Regression pca results:'
 
     y_pred, model, results = evaluate_test_set(cross_val, df)
 
