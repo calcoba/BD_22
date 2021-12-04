@@ -16,7 +16,7 @@ def load_data(spark, file_path):
                                  'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
 
     # Eliminate variables that are not related with the delay
-    plane_data = plane_data.drop('TailNum', 'DayofMonth', 'FlightNum')
+    plane_data = plane_data.drop('TailNum', 'FlightNum')
 
     # Eliminate Cancelled flights and, then, the cancellation columns
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
@@ -39,7 +39,7 @@ def load_data(spark, file_path):
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     plane_data = plane_data.withColumn('Week', F.when(plane_data.Weekend == 0, 1).otherwise(0))
-    plane_data = plane_data.drop('Month', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
+    plane_data = plane_data.drop('Month','DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
                                  'Dest_index', 'Route_index', 'CRSElapsedTime')
 
 

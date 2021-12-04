@@ -33,13 +33,24 @@ if __name__ == '__main__':
                                                        plane_db.drop('features', 'features_scaled').columns)
 
     eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'))
-    '''print(eigenvalues, eigenvectors)
-    pca_data.show(5)'''
+    
     correlation_matrix_pca = data_exploration.compute_corr(pca_data.select('pca_features', 'ArrDelay'),
                                                            ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'PCA_4',
                                                             'PCA_5', 'PCA_6', 'PCA_7', 'PCA_8', 'PCA_9', 'ArrDelay'])
 
-    y_pred_gbt = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
-    y_pred_lr = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
-    # y_pred_dt = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
-    y_pred_lr_pca = models.linear_regression_model(pca_data, features_col="pca_features")
+    y_pred_gbt, gbt_data = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
+    y_pred_lr, lr_data = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
+    for line in lr_data:
+        print(line)
+    y_pred_dt, dt_data = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
+    y_pred_lr_pca, lr_pca_data = models.linear_regression_model(pca_data, features_col="pca_features")
+
+    complete_results = []
+    complete_results.extend(gbt_data)
+    complete_results.extend(lr_data)
+    complete_results.extend(dt_data)
+    complete_results.extend(lr_pca_data)
+    with open('results.txt', 'w') as file_name:
+        for line in complete_results:
+            file_name.write(line+'\n')
+        file_name.close()

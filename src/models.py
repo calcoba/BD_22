@@ -10,7 +10,7 @@ def evaluate_test_set(cross_val, df):
     a test set, used for measuring the model performance. As it is a cross-validation model fitting will be done for
     each set of parameters passed in the cross_val variable, with also cross validation for selecting the best
     parameter set.
-    The function will plot two measures selected for assessing the performance of the model, the coefficient
+    The function will compute two measures selected for assessing the performance of the model, the coefficient
     of linear determination (r2) and the Root Mean Squared Error (rmse). For evaluating this models
     the RegressionEvaluator function from pyspark is used.
         :parameter
@@ -20,6 +20,7 @@ def evaluate_test_set(cross_val, df):
         :returns
             y_pred: the model prediction for the test set.
             best_model: the bes model encountered after the cross-validation is performed.
+            results: the results of the two metrics applied to the test set are stored.
     """
 
     train_df, test_df = df.randomSplit([0.9, 0.1], seed=0)
@@ -27,14 +28,14 @@ def evaluate_test_set(cross_val, df):
     predictions = cv_model.transform(test_df)
     regression_evaluator_r2 = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="r2")
     regression_evaluator_rmse = RegressionEvaluator(predictionCol="prediction", labelCol="ArrDelay", metricName="rmse")
-
-    print("R Squared (R2) on test data = %g" % regression_evaluator_r2.evaluate(predictions))
-    print("RMSE on test data = %g" % regression_evaluator_rmse.evaluate(predictions))
+    results = ["  Model results:"
+               "    R Squared (R2) on test data = %g" % regression_evaluator_r2.evaluate(predictions),
+               "    RMSE on test data = %g" % regression_evaluator_rmse.evaluate(predictions)]
 
     y_pred = predictions.select(['prediction'])
     best_model = cv_model.bestModel
 
-    return y_pred, best_model
+    return y_pred, best_model, results
 
 
 def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'):
@@ -63,13 +64,19 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
                                evaluator=RegressionEvaluator(labelCol='ArrDelay', metricName='r2'),
                                numFolds=3)
 
-    print('Decision Tree results:')
+    model_data = []
+    header_data = 'Decision Tree results:'
+    print(header_data)
 
-    y_pred, model = evaluate_test_set(cross_val, df)
+    y_pred, model, results = evaluate_test_set(cross_val, df)
 
-    print('Best model has parameters:')
-    print('Maximum depth parameter: ', model.getMaxDepth())
-    print('Maximum bins parameter: ', model.getMaxBins())
+    parameter_data = ['  Best model has parameters:',
+                      '    Maximum Depth parameter: {}'.format(model.getMaxDepth()),
+                      '    Maximum beans parameter: {}'.format(model.getMaxBins())]
+
+    model_data.append(header_data)
+    model_data.extend(parameter_data)
+    model_data.extend(results)
 
     return y_pred
 
@@ -88,6 +95,7 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
             label_col: optional with default value 'ArrDelay', the column name of the target variable.
         :returns
             y_pred: the prediction made for the test set.
+            model_data: a list with the model data in string format with the header for each line.
     """
 
     lr = LinearRegression(featuresCol=features_col, labelCol=label_col, maxIter=100,  fitIntercept=True)
@@ -99,15 +107,22 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
                                estimatorParamMaps=param_grid,
                                evaluator=RegressionEvaluator(labelCol='ArrDelay', metricName='r2'),
                                numFolds=3)
-    print('Logistic Regression results:')
 
-    y_pred, model = evaluate_test_set(cross_val, df)
+    model_data = []
+    header_data = 'Logistic Regression results:'
+    print(header_data)
 
-    print('Best model has parameters:')
-    print('Reg parameter: ', model.getRegParam())
-    print('Elastic Net parameter: ', model.getElasticNetParam())
+    y_pred, model, results = evaluate_test_set(cross_val, df)
 
-    return y_pred
+    parameter_data = ['  Best model has parameters:',
+                      '    Reg parameter: {}'.format(model.getRegParam()),
+                      '    Elastic Net parameter: {}'.format(model.getElasticNetParam())]
+
+    model_data.append(header_data)
+    model_data.extend(parameter_data)
+    model_data.extend(results)
+
+    return y_pred, model_data
 
 
 def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'):
@@ -136,12 +151,18 @@ def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'
                                evaluator=RegressionEvaluator(labelCol='ArrDelay', metricName='r2'),
                                numFolds=3)
 
-    print('GTB regression results:')
+    model_data = []
+    header_data = 'GBT Regression results:'
+    print(header_data)
 
-    y_pred, model = evaluate_test_set(cross_val, df)
+    y_pred, model, results = evaluate_test_set(cross_val, df)
 
-    print('Best model has parameters:')
-    print('Maximum depth parameter: ', model.getMaxDepth())
-    print('Subsampling Rate parameter: ', model.getSubsamplingRate())
+    parameter_data = ['  Best model has parameters:',
+                      '    Maximum Depth parameter: {}'.format(model.getMaxDepth()),
+                      '    Subsampling rate parameter: {}'.format(model.getSubsamplingRate())]
+
+    model_data.append(header_data)
+    model_data.extend(parameter_data)
+    model_data.extend(results)
 
     return y_pred
