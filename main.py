@@ -31,8 +31,7 @@ if __name__ == '__main__':
 
     data_exploration.compute_corr(plane_db.drop('features', 'features_scaled'),
                                   plane_db.drop('features', 'features_scaled').columns)
-    '''chiSquared_results = data_exploration.compute_ChiSquared(plane_db)
-    print(str(chiSquared_results.select('statistics').show(truncate=False)))'''
+
 
     eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'))
     '''print(eigenvalues, eigenvectors)
@@ -43,6 +42,7 @@ if __name__ == '__main__':
 
     '''y_true, y_pred = models.RandomForest(plane_db.drop('UniqueCarrier_index', 'TailNum_index',
                                                        'Origin_index', 'Dest_index'))'''
+    y_pred_gbt = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
     y_pred_lr = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
-    y_pred_dt = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
+    # y_pred_dt = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
     y_pred_lr_pca = models.linear_regression_model(pca_data, features_col="pca_features")
