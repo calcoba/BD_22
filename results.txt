@@ -1,0 +1,6 @@
+Logistic Regression results:
+Best model has parameters:
+Reg parameter: 0.001
+Elastic Net parameter: 0.5
+R Squared (R2) on test data = 0.902064
+RMSE on test data = 11.4604
