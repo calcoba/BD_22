@@ -78,7 +78,7 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
     model_data.extend(parameter_data)
     model_data.extend(results)
 
-    return y_pred
+    return y_pred, model_data
 
 
 def linear_regression_model(df, features_col='features_scaled', label_col='ArrDelay'):
@@ -165,4 +165,4 @@ def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'
     model_data.extend(parameter_data)
     model_data.extend(results)
 
-    return y_pred
+    return y_pred, model_data
