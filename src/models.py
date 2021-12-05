@@ -76,7 +76,7 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
     model_data.append(header_data)
     model_data.extend(parameter_data)
     model_data.extend(results)
-    model.write().overwrite().save('dt_model/')
+    model.write().overwrite().save('results/dt_model/')
     print('Decision Tree trained')
 
     return y_pred, model_data
@@ -124,9 +124,9 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
     model_data.extend(parameter_data)
     model_data.extend(results)
     if not features_col == 'features_scaled':
-        model.write().overwrite().save('lr_pca_model/')
+        model.write().overwrite().save('results/lr_pca_model/')
     else:
-        model.write().overwrite().save('lr_model/')
+        model.write().overwrite().save('results/lr_model/')
     print('Linear regression trained')
 
     return y_pred, model_data

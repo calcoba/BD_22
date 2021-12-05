@@ -67,13 +67,13 @@ if __name__ == '__main__':
         print('Starting test')
         model_name = sys.argv[2]
         if model_name == 'lr':
-            model_path = 'lr_model'
+            model_path = 'results/lr_model'
             features = 'features_scaled'
         elif model_name == 'dt':
-            model_path = 'dt_model'
+            model_path = 'results/dt_model'
             features = 'features_scaled'
         elif model_name == 'lr_pca':
-            model_path = 'lr_pca_model'
+            model_path = 'results/lr_pca_model'
             features = 'pca_features'
             plane_db = pca_data
         else:

@@ -5,7 +5,7 @@ from pyspark.ml import Pipeline, PipelineModel
 
 def load_data(spark, file_path, validation=False):
     plane_data = spark.read.csv(file_path, header=True, inferSchema=True, nanValue='NA')
-    
+
     print("Imported data: \n")
     plane_data.show(5)
     print('All csv files loaded. DataFrame created.')
@@ -22,7 +22,6 @@ def load_data(spark, file_path, validation=False):
     plane_data = plane_data.filter(plane_data.Cancelled == 0)
     plane_data = plane_data.drop('Cancelled', 'CancellationCode', 'TailNum')
 
-
     # Numerically encode remaining categorical variables and creating new ones
     plane_data = plane_data.withColumn('Route', F.concat(plane_data.Origin, plane_data.Dest))
     indexer = [StringIndexer(inputCol=column_name, outputCol=column_name + '_index')
@@ -32,14 +31,13 @@ def load_data(spark, file_path, validation=False):
                              splitsArray=[[0, 400, 800, 1200, 1600, 2000, 2400], [1, 7, 14, 21, 31], [1, 4, 7]])]
     quantilizer = [QuantileDiscretizer(inputCol='Distance', outputCol='Distance_coded', numBuckets=10)]
 
-    pipeline = Pipeline(stages=indexer+bucketizer+quantilizer)
+    pipeline = Pipeline(stages=indexer + bucketizer + quantilizer)
     plane_data = plane_data.fillna(0, subset='TaxiOut')
-    plane_data = plane_data.withColumn('TotalDepDelay', plane_data.DepDelay+plane_data.TaxiOut)
+    plane_data = plane_data.withColumn('TotalDepDelay', plane_data.DepDelay + plane_data.TaxiOut)
 
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     plane_data = plane_data.withColumn('Week', F.when(plane_data.Weekend == 0, 1).otherwise(0))
-
 
     # Eliminate redundant categorical columns
     cols_filtered = [c for c, t in plane_data.dtypes if t != 'string']
@@ -56,9 +54,9 @@ def load_data(spark, file_path, validation=False):
         scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
         pipeline = Pipeline(stages=[assembler, scaler]).fit(plane_data_clean)
         data_scaled = pipeline.transform(plane_data_clean)
-        pipeline.write().overwrite().save('standardization_model/')
+        pipeline.write().overwrite().save('results/standardization_model/')
     else:
-        pipeline = PipelineModel.load('standardization_model/')
+        pipeline = PipelineModel.load('results/standardization_model/')
         data_scaled = pipeline.transform(plane_data_clean)
 
     print("Scaled and prepared data: \n")
