@@ -51,7 +51,7 @@ def load_data(spark, file_path, validation=False):
 
     # Select final features, merge variables and scale them
     if not validation:
-        features_to_keep = ['DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
+        features_to_keep = ['DepTime', 'CRSDepTime', 'CRSArrTime', 'TotalDepDelay', 'DepTimePeriod']
         assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
         scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
         pipeline = Pipeline(stages=[assembler, scaler]).fit(plane_data_clean)
