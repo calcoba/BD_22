@@ -66,7 +66,6 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
 
     model_data = []
     header_data = 'Decision Tree results:'
-    print(header_data)
 
     y_pred, model, results = evaluate_test_set(cross_val, df)
 
@@ -161,7 +160,6 @@ def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'
 
     model_data = []
     header_data = 'GBT Regression results:'
-    print(header_data)
 
     y_pred, model, results = evaluate_test_set(cross_val, df)
 
