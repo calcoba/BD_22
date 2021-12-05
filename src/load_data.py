@@ -1,9 +1,9 @@
 import pyspark.sql.functions as F
 from pyspark.ml.feature import StringIndexer, StandardScaler, VectorAssembler, QuantileDiscretizer, Bucketizer
-from pyspark.ml import Pipeline
+from pyspark.ml import Pipeline, PipelineModel
 
 
-def load_data(spark, file_path):
+def load_data(spark, file_path, validation=False):
     plane_data = spark.read.csv(file_path, header=True, inferSchema=True, nanValue='NA')
     
     print("Imported data: \n")
@@ -12,7 +12,7 @@ def load_data(spark, file_path):
     print("Number of instances:", plane_data.count())
 
     # Eliminate forbidden variables
-    plane_data = plane_data.drop('ArrTime', 'ActualElapsedTime', 'AirTime', 'TaxiIn', 'Diverted',
+    plane_data = plane_data.drop('Year', 'ArrTime', 'ActualElapsedTime', 'AirTime', 'TaxiIn', 'Diverted',
                                  'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay')
 
     # Eliminate variables that are not related with the delay
@@ -53,12 +53,18 @@ def load_data(spark, file_path):
     plane_data_clean.show(5, False)
     print("Number of instances after preprocessing:", plane_data_clean.count())
 
-    # Select final variables, merge and scale them
-    features_to_keep = ['Year', 'DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
-    assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
-    scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
-    pipeline = Pipeline(stages=[assembler, scaler])
-    data_scaled = pipeline.fit(plane_data_clean).transform(plane_data_clean)
+    # Merge variables and scale them
+    if not validation:
+        features_to_keep = ['DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
+        assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
+        scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
+        pipeline = Pipeline(stages=[assembler, scaler]).fit(plane_data_clean)
+        data_scaled = pipeline.transform(plane_data_clean)
+        pipeline.write().overwrite().save('standardization_model/')
+    else:
+        pipeline = PipelineModel.load('standardization_model/')
+        data_scaled = pipeline.transform(plane_data_clean)
+
 
     # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
     print("Scaled and prepared data: \n")

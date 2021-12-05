@@ -1,4 +1,4 @@
-from pyspark.ml.regression import RandomForestRegressor, DecisionTreeRegressor, LinearRegression, GBTRegressor
+from pyspark.ml.regression import DecisionTreeRegressor, LinearRegression, GBTRegressor, AFTSurvivalRegression
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
 import numpy as np
@@ -129,47 +129,4 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
         model.write().overwrite().save('lr_model/')
     print('Logistic regression trained')
 
-    return y_pred, model_data
-
-
-def GBT_regressor_model(df, features_col='features_scaled', label_col='ArrDelay'):
-    """This function will implement a cross-validated GBT regression model with parameter grid search,
-    to be passed to the evaluation function.
-    The model created will perform a grid search for the maximum depth and subsampling parameters with a
-    cross-validation of 3.
-    Once the evaluation is performed the function will plot the best parameter found during the fit.
-        :parameter
-            df: dataframe variable with the database to be used in the model. It is in vectorized form with a features
-            column and a label column (ArrDelay)
-            features_col: optional with default value 'features_scaled', is the name of the column in the dataframe
-            where the independent variables are stored in vectorized form.
-            label_col: optional with default value 'ArrDelay', the column name of the target variable.
-        :returns
-            y_pred: the prediction made for the test set
-    """
-
-    print('GBT Regression started')
-    gbt = GBTRegressor(featuresCol=features_col, labelCol=label_col, seed=0)
-    param_grid = ParamGridBuilder() \
-        .addGrid(gbt.maxDepth, [5, 10, 15]) \
-        .build()
-    cross_val = CrossValidator(estimator=gbt,
-                               estimatorParamMaps=param_grid,
-                               evaluator=RegressionEvaluator(labelCol='ArrDelay', metricName='r2'),
-                               numFolds=3)
-
-    model_data = []
-    header_data = 'GBT Regression results:'
-
-    y_pred, model, results = evaluate_test_set(cross_val, df)
-
-    parameter_data = ['  Best model has parameters:',
-                      '    Maximum Depth parameter: {}'.format(model.getMaxDepth()),
-                      '    Subsampling rate parameter: {}'.format(model.getSubsamplingRate())]
-
-    model_data.append(header_data)
-    model_data.extend(parameter_data)
-    model_data.extend(results)
-    model.write().overwrite().save('gbt_model/')
-    print('GBT regression trained')
     return y_pred, model_data

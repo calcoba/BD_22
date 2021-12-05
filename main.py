@@ -12,6 +12,11 @@ if __name__ == '__main__':
         .config("spark.driver.memory", "14g") \
         .getOrCreate()
 
+    if len(sys.argv) == 3:
+        validation = True
+    else:
+        validation = False
+
     ### Locating, decompressing and loading data ###
     if len(sys.argv) > 1:
         path = sys.argv[1]+'/'
@@ -30,9 +35,10 @@ if __name__ == '__main__':
         compressed_file_path = glob.glob(path + '*.csv.bz2')
         decompress.decompress_bz2(compressed_file_path)  # Decompress bz2 files
 
-    plane_db = load_data.load_data(spark, path + '*.csv')
+    plane_db = load_data.load_data(spark, path + '*.csv', validation)
 
-    eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'))
+    eigenvalues, eigenvectors, pca_data = PCA.pca(plane_db.select('features_scaled', 'ArrDelay'), validation=validation)
+    print(eigenvalues, eigenvectors)
 
     if len(sys.argv) == 1 or len(sys.argv) == 2:
         print('Generating model from data')
@@ -44,13 +50,11 @@ if __name__ == '__main__':
                                                                ['PCA_0', 'PCA_1', 'PCA_2', 'PCA_3', 'PCA_4',
                                                                 'ArrDelay'], name='PCA_features')
 
-        y_pred_gbt, gbt_data = models.GBT_regressor_model(plane_db.select('features_scaled', 'ArrDelay'))
         y_pred_lr, lr_data = models.linear_regression_model(plane_db.select('features_scaled', 'ArrDelay'))
         y_pred_dt, dt_data = models.decision_tree_model(plane_db.select('features_scaled', 'ArrDelay'))
         y_pred_lr_pca, lr_pca_data = models.linear_regression_model(pca_data, features_col="pca_features")
 
         complete_results = []
-        complete_results.extend(gbt_data)
         complete_results.extend(lr_data)
         complete_results.extend(dt_data)
         complete_results.extend(lr_pca_data)
@@ -64,9 +68,6 @@ if __name__ == '__main__':
         model_name = sys.argv[2]
         if model_name == 'lr':
             model_path = 'lr_model'
-            features = 'features_scaled'
-        elif model_name == 'gbt':
-            model_path = 'gbt_model'
             features = 'features_scaled'
         elif model_name == 'dt':
             model_path = 'dt_model'
