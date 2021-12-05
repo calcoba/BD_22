@@ -65,8 +65,9 @@ def load_data(spark, file_path, validation=False):
         pipeline = PipelineModel.load('standardization_model/')
         data_scaled = pipeline.transform(plane_data_clean)
 
+
     # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
+    print("Scaled and prepared data: \n")
     data_scaled.show(10, False)
-    print("Number of instances after preprocessing:", data_scaled.count())
 
     return data_scaled
