@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1638703062195,"sparkVersion":"3.0.0","uid":"VectorAssembler_fc5ae7bd8d52","paramMap":{"inputCols":["DepTime","CRSDepTime","TaxiOut","TotalDepDelay","DepTimePeriod"],"outputCol":"features"},"defaultParamMap":{"handleInvalid":"error","outputCol":"VectorAssembler_fc5ae7bd8d52__output"}}
