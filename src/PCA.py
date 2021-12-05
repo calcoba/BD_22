@@ -1,7 +1,7 @@
 from pyspark.ml.feature import PCA, PCAModel
 
 
-def pca(df, k_number=5, validation=False):
+def pca(df, k_number=6, validation=False):
     if not validation:
         pca_model = PCA(k=k_number, inputCol="features_scaled", outputCol="pca_features")
         model = pca_model.fit(df)
