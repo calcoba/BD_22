@@ -83,7 +83,7 @@ def decision_tree_model(df, features_col='features_scaled', label_col='ArrDelay'
 
 
 def linear_regression_model(df, features_col='features_scaled', label_col='ArrDelay'):
-    """This function will implement a cross-validated logistic regression model with parameter grid search,
+    """This function will implement a cross-validated linear regression model with parameter grid search,
     to be passed to the evaluation function.
     The model created will perform a grid search for the regression and elastic net parameters with a
     cross-validation of 3.
@@ -98,7 +98,7 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
             y_pred: the prediction made for the test set.
             model_data: a list with the model data in string format with the header for each line.
     """
-    print('Logistic Regression started')
+    print('Linear Regression started')
     lr = LinearRegression(featuresCol=features_col, labelCol=label_col, maxIter=100,  fitIntercept=True)
     param_grid = ParamGridBuilder()\
         .addGrid(lr.regParam, [0.1, 0.01, 0.001])\
@@ -110,9 +110,9 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
                                numFolds=3)
 
     model_data = []
-    header_data = 'Logistic Regression results:'
+    header_data = 'Linear Regression results:'
     if features_col == 'pca_features':
-        header_data = 'Logistic Regression pca results:'
+        header_data = 'Linear Regression pca results:'
 
     y_pred, model, results = evaluate_test_set(cross_val, df)
 
@@ -127,6 +127,6 @@ def linear_regression_model(df, features_col='features_scaled', label_col='ArrDe
         model.write().overwrite().save('lr_pca_model/')
     else:
         model.write().overwrite().save('lr_model/')
-    print('Logistic regression trained')
+    print('Linear regression trained')
 
     return y_pred, model_data

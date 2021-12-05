@@ -39,10 +39,6 @@ def load_data(spark, file_path, validation=False):
     plane_data = plane_data.na.drop()
     plane_data = pipeline.fit(plane_data).transform(plane_data)
     plane_data = plane_data.withColumn('Week', F.when(plane_data.Weekend == 0, 1).otherwise(0))
-    '''plane_data = plane_data.drop('Month','DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
-                                 'Dest_index', 'Route_index', 'CRSElapsedTime', 'Month')'''
-    features_to_drop = ['Month', 'DayofMonth', 'DayOfWeek', 'Distance', 'UniqueCarrier_index', 'Origin_index',
-                        'Dest_index', 'Route_index', 'CRSElapsedTime', 'Month']
 
 
     # Eliminate redundant categorical columns
@@ -53,7 +49,7 @@ def load_data(spark, file_path, validation=False):
     plane_data_clean.show(5, False)
     print("Number of instances after preprocessing:", plane_data_clean.count())
 
-    # Merge variables and scale them
+    # Select final features, merge variables and scale them
     if not validation:
         features_to_keep = ['DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
         assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
@@ -65,8 +61,6 @@ def load_data(spark, file_path, validation=False):
         pipeline = PipelineModel.load('standardization_model/')
         data_scaled = pipeline.transform(plane_data_clean)
 
-
-    # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
     print("Scaled and prepared data: \n")
     data_scaled.show(10, False)
 

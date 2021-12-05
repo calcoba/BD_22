@@ -1,4 +1,4 @@
-Logistic Regression results:
+Linear Regression results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
@@ -12,7 +12,7 @@ Decision Tree results:
   Model results:
     R Squared (R2) on test data = 0.900666
     RMSE on test data = 12.3684
-Logistic Regression pca results:
+Linear Regression pca results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
