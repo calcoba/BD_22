@@ -3,19 +3,19 @@ Linear Regression results:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.920837
-    RMSE on test data = 11.0414
+    R Squared (R2) on test data = 0.919053
+    RMSE on test data = 11.2063
 Decision Tree results:
   Best model has parameters:
     Maximum Depth parameter: 15
     Maximum beans parameter: 32
   Model results:
-    R Squared (R2) on test data = 0.900666
-    RMSE on test data = 12.3684
+    R Squared (R2) on test data = 0.900134
+    RMSE on test data = 12.4472
 Linear Regression pca results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.921382
-    RMSE on test data = 11.0107
+    R Squared (R2) on test data = 0.91726
+    RMSE on test data = 11.232
