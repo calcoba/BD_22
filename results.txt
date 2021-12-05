@@ -1,14 +1,28 @@
+GBT Regression results:
+  Best model has parameters:
+    Maximum Depth parameter: 10
+    Subsampling rate parameter: 1.0
+  Model results:
+    R Squared (R2) on test data = 0.909093
+    RMSE on test data = 11.8321
 Logistic Regression results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.907777
-    RMSE on test data = 11.1009
-Logistic Regression results:
+    R Squared (R2) on test data = 0.920837
+    RMSE on test data = 11.0414
+Decision Tree results:
+  Best model has parameters:
+    Maximum Depth parameter: 15
+    Maximum beans parameter: 32
+  Model results:
+    R Squared (R2) on test data = 0.900623
+    RMSE on test data = 12.371
+Logistic Regression pca results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.911279
-    RMSE on test data = 10.9992
+    R Squared (R2) on test data = 0.921451
+    RMSE on test data = 11.0073
