@@ -3,19 +3,19 @@ Logistic Regression results:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.920884
-    RMSE on test data = 11.1646
+    R Squared (R2) on test data = 0.920837
+    RMSE on test data = 11.0414
 Decision Tree results:
   Best model has parameters:
     Maximum Depth parameter: 15
     Maximum beans parameter: 32
   Model results:
-    R Squared (R2) on test data = 0.893915
-    RMSE on test data = 12.9282
+    R Squared (R2) on test data = 0.900666
+    RMSE on test data = 12.3684
 Logistic Regression pca results:
   Best model has parameters:
     Reg parameter: 0.001
     Elastic Net parameter: 0.0
   Model results:
-    R Squared (R2) on test data = 0.918523
-    RMSE on test data = 11.144
+    R Squared (R2) on test data = 0.921382
+    RMSE on test data = 11.0107
