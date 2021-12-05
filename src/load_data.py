@@ -53,7 +53,7 @@ def load_data(spark, file_path):
     plane_data_clean.show(5, False)
     print("Number of instances after preprocessing:", plane_data_clean.count())
 
-    # Merge variables and scale them
+    # Select final variables, merge and scale them
     features_to_keep = ['Year', 'DepTime', 'CRSDepTime', 'TaxiOut', 'TotalDepDelay', 'DepTimePeriod']
     assembler = VectorAssembler(inputCols=plane_data_clean.select(*features_to_keep).columns, outputCol="features")
     scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
@@ -61,7 +61,7 @@ def load_data(spark, file_path):
     data_scaled = pipeline.fit(plane_data_clean).transform(plane_data_clean)
 
     # plane_data.select([F.count(F.when(F.isnan(c), c)).alias(c) for c in plane_data.columns]).show()
+    print("Scaled and prepared data: \n")
     data_scaled.show(10, False)
-    print("Number of instances after preprocessing:", data_scaled.count())
 
     return data_scaled
